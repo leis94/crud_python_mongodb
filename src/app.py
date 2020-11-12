@@ -8,8 +8,35 @@ mongo = PyMongo(app)
 
 @app.route('/tasks', methods=['POST'])
 def create_task():
-    print(request)
-    return 'Received'
+    title = request.json['title']
+    description = request.json['description']
+
+    if title and description:
+        id = mongo.db.tasks.insert_one(
+            {
+                'title': title,
+                'description': description
+            }
+        )
+        response = {
+            'id': str(id),
+            'title': title,
+            'description': description
+        }
+        return response
+    else:
+        return not found()
+
+
+@app.errorhandler(404)
+def not_found(error=None):
+    #Handle errors
+    response = jsonify ({
+        'message': 'Resource Not Found: ' + request.url,
+        'status': 404
+    })
+    response.status_code = 404
+    return response
 
 
 if __name__== "__main__":
