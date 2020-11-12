@@ -53,6 +53,20 @@ def delete_task(id):
     return Response(response, mimetype='application/json')
 
 
+@app.route('/tasks/<id>', methods=['PUT'])
+def update_task(id):
+    title = request.json['title']
+    description = request.json['description']
+    
+    if title and description:
+        task = mongo.db.tasks.update_one({'_id': ObjectId(id)}, {'$set': {
+            'title': title,
+            'description': description
+        }})
+        response = jsonify({'message': 'Task ' + id + ' was updated succesfully'})
+        return response
+
+
 @app.errorhandler(404)
 def not_found(error=None):
     #Handle errors
