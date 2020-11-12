@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, json, jsonify, Response
 from flask_pymongo import PyMongo
 from bson import json_util
 from bson.objectid import ObjectId
@@ -42,6 +42,14 @@ def get_tasks():
 def get_task(id):
     task = mongo.db.tasks.find_one({'_id': ObjectId(id)})
     response = json_util.dumps(task)
+    return Response(response, mimetype='application/json')
+
+
+@app.route('/tasks/<id>', methods=['DELETE'])
+def delete_task(id):
+    task = mongo.db.tasks.find_one_and_delete({'_id': ObjectId(id)})
+    #response = jsonify({'message': 'Task ' + id + ' was deleted succesfully'})
+    response = json.dumps(task, default=json_util.default)
     return Response(response, mimetype='application/json')
 
 
